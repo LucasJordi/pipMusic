@@ -40,10 +40,15 @@ export const Player=(props)=>{
 
                 </View>
                 <View style={styles.bottom}>
-                    <View style={{flex:10}}>
+                    <View style={{flex:10,justifyContent:"space-around",alignItems:"center"}}>
+                       
+                        <View style={styles.playerCenterBall}>
+
+                        </View>
                         <TextC>{props.playing?.nome}</TextC>
 
                     </View>
+                    
 
 
 

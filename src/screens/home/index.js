@@ -40,29 +40,27 @@ export const Home=()=>{
         sound.setOnPlaybackStatusUpdate((event)=>{
           setTime({position:!event.positionMillis? 0:event.positionMillis,duration:!event.durationMillis?0:event.durationMillis})
           setAction(event.isPlaying)
-          console.log(event)
-          if(event.positionMillis===event.durationMillis&&event.positionMillis>0){
-            console.log("terminou")
-            setTimeout(()=>{
-                backForward("forward")
-
-            },1000)
-            
-            
-
-          }
+          
           
           
         });
-        await sound.loadAsync({uri:item.content},0,true)
-        
-        
-        
+        await sound.loadAsync({uri:item.content},{positionMillis:0},true)        
         await sound.playAsync();
         setPlaying(item)
         setAction(true)
     
     }
+    useEffect(()=>{
+        if(time.position===time.duration&&time.position>0){
+            console.log("terminou")
+            setTimeout(()=>{
+                backForward("forward")
+
+            },1000)           
+            
+
+          }
+    },[time])
     const playPause= async()=>{
         if(action){
             await sound.pauseAsync();

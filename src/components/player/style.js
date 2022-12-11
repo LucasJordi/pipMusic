@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
-
+import { Dimensions } from 'react-native'
+const width=Dimensions.get("window").width
 
 export const styles = StyleSheet.create({
     container:{
@@ -39,9 +40,16 @@ export const styles = StyleSheet.create({
         flexDirection:"row",
         
     },
+
     touchPlay:{
         flex:1,
         alignItems:"center",
         justifyContent:"center"
+    },
+    playerCenterBall:{
+        width:width*0.8,
+        height:width*0.8,
+        backgroundColor:"gray",
+        borderRadius:width/2
     }
 })
