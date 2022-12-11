@@ -23,7 +23,7 @@ export const TextC=(props)=>{
     return <View />;
     } else {
     return(
-        <Text style={[props.style,{fontFamily:props.fontFamily? props.fontFamily:'Inter_500Medium'}]}>
+        <Text style={[props.style,{fontFamily:props.fontFamily? props.fontFamily:'Inter_500Medium'}]} allowFontScaling={false}>
             {props.children}
         </Text>
     )

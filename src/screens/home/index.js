@@ -4,10 +4,13 @@ import * as DriveService from "../../services/drive.service"
 import { useEffect, useRef, useState } from "react"
 import { Audio } from "expo-av"
 import { TextC } from "../../components/textComponent"
+import { Player } from "../../components/player"
 
 
 export const Home=()=>{
     const [musics,setMusics]=useState([])
+    const [enablePlayer,setEnablePlayer]=useState(false)
+    const [replay,setReplay]=useState(false)
     const rotateAnim = useRef(new Animated.Value(45)).current
     const spin = rotateAnim.interpolate({
         inputRange: [0, 360],
@@ -35,13 +38,23 @@ export const Home=()=>{
         
         // await sound.stopAsync()
         sound.setOnPlaybackStatusUpdate((event)=>{
-          console.log(event)
           setTime({position:!event.positionMillis? 0:event.positionMillis,duration:!event.durationMillis?0:event.durationMillis})
           setAction(event.isPlaying)
+          console.log(event)
+          if(event.positionMillis===event.durationMillis&&event.positionMillis>0){
+            console.log("terminou")
+            setTimeout(()=>{
+                backForward("forward")
+
+            },1000)
+            
+            
+
+          }
           
           
         });
-        await sound.loadAsync({uri:item.content},0,false)
+        await sound.loadAsync({uri:item.content},0,true)
         
         
         
@@ -55,6 +68,9 @@ export const Home=()=>{
             await sound.pauseAsync();
             
         }else{
+            if(time.duration===time.position){
+                return startMusic(playing)
+            }
             await sound.playAsync();
             
         }
@@ -78,7 +94,7 @@ export const Home=()=>{
         .then(data=>data.json())
         .then(data=>{
           
-          setMusics(data.files)
+          setMusics(data.files.filter(element=> element.format==='audio/mpeg'||element.format==='audio/x-wav'))
           
         })
         .catch(e=>console.log("error",e))
@@ -94,11 +110,49 @@ export const Home=()=>{
         return `${minute}:${secs}`
 
     }
+    const backForward=(type)=>{
+        const findI=(element)=> element.content===playing?.content
+        const index=musics.findIndex(findI);
+        console.log(playing)
+        
+        if(type==='forward'){
+            if(index>=(musics.length-1)){
+
+            }else{
+                startMusic(musics[index+1])
+
+            }
+
+
+        }else{
+            if(index<=0){
+
+            }else{
+                startMusic(musics[index-1])
+
+            }
+
+        }
+    }
 
     return(
         <View style={styles.container}>
+            <Player 
+                playerEnable={enablePlayer} 
+                setEnablePlayer={()=>setEnablePlayer(!enablePlayer)}
+                action={action}
+                playing={playing}
+                backForward={(type)=>{
+                    backForward(type)
+                    console.log(type)
+                }}
+                time={time}
+                playPause={()=>playPause()}
+            >
+
+            </Player>
             {playing!=null&& <View style={styles.floatMusic}>
-                <TouchableOpacity style={[styles.flexP]}>
+                <TouchableOpacity style={[styles.flexP]} onPress={()=>setEnablePlayer(true)}>
                     <TextC fontFamily={"Inter_500Medium"} style={styles.textPlay}>
                         {playing.nome}
                     </TextC>
@@ -108,7 +162,7 @@ export const Home=()=>{
 
                 </TouchableOpacity>
                 <View style={[styles.flex1,{flexDirection:"row"}]}>
-                    <TouchableOpacity style={{flex:1}}>
+                    <TouchableOpacity style={{flex:1}} onPress={()=>backForward('back')}>
                         <Image 
                             style={{resizeMode:"contain",width:"100%",height:"90%"}} 
                             source={require("../../../assets/play-back-outline.png")} 
@@ -131,7 +185,7 @@ export const Home=()=>{
 
 
                     </TouchableOpacity>
-                    <TouchableOpacity style={{flex:1}}>
+                    <TouchableOpacity style={{flex:1}} onPress={()=>backForward('forward')}>
                         <Image 
                             style={{resizeMode:"contain",width:"100%",height:"90%"}} 
                             source={require("../../../assets/play-forward-outline.png")} 
@@ -179,7 +233,7 @@ export const Home=()=>{
                     <TouchableOpacity style={styles.divMusic} >  
                         <View style={styles.musicT}>
                             <TouchableOpacity style={styles.flex1} onPress={()=>startMusic(item)}>
-                                <Image style={{resizeMode:"contain",height:"60%",width:"70%"}} source={require("../../../assets/musical-notes-outline.png")}/>
+                                <Image  style={{resizeMode:"contain",height:"60%",width:"70%"}} source={require("../../../assets/musical-notes-outline.png")}/>
 
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.flexM} onPress={()=>startMusic(item)}>
@@ -192,7 +246,7 @@ export const Home=()=>{
 
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.flex1}>
-                                <Image style={{resizeMode:"contain",height:"80%",width:"70%"}} source={require("../../../assets/ellipsis-horizontal-outline.png")}/>
+                                <Image  style={{resizeMode:"contain",height:"80%",width:"70%"}} source={require("../../../assets/ellipsis-horizontal-outline.png")}/>
 
                             
 
